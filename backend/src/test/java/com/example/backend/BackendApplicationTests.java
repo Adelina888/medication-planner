@@ -9,5 +9,8 @@ class BackendApplicationTests {
 	//Test
 	//void contextLoads() {
 	//}
-
+    @Test
+    void simpleTest() {
+        org.junit.jupiter.api.Assertions.assertTrue(true);
+    }
 }
