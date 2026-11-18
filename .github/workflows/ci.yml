@@ -48,3 +48,51 @@ jobs:
           path: frontend/coverage/
       - name: Build
         run: npm run build
+
+  metrics:
+    name: Calculate CI Stability Metric
+    runs-on: ubuntu-latest
+    needs: [backend-build, frontend-build]
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Calculate Pipeline Success Rate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUNS_DATA=$(gh api repos/${{ github.repository }}/actions/workflows/ci.yml/runs?per_page=20)
+
+          TOTAL_RUNS=$(echo "$RUNS_DATA" | jq '.workflow_runs | length')
+          SUCCESS_RUNS=$(echo "$RUNS_DATA" | jq '[.workflow_runs[] | select(.conclusion == "success")] | length')
+          FAILED_RUNS=$(echo "$RUNS_DATA" | jq '[.workflow_runs[] | select(.conclusion == "failure")] | length')
+          OTHER_RUNS=$(echo "$RUNS_DATA" | jq '[.workflow_runs[] | select(.conclusion != "success" and .conclusion != "failure")] | length')
+
+          if [ "$TOTAL_RUNS" -gt 0 ]; then
+            SUCCESS_RATE=$(awk "BEGIN {printf \"%.2f\", ($SUCCESS_RUNS / $TOTAL_RUNS) * 100}")
+          else
+            SUCCESS_RATE="0.00"
+          fi
+
+          echo "###  Автоматический сбор метрик CI" >> $GITHUB_STEP_SUMMARY
+          echo "- **Workflow**: \`ci.yml\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Всего последних запусков**: $TOTAL_RUNS" >> $GITHUB_STEP_SUMMARY
+          echo "- **Успешных**: $SUCCESS_RUNS" >> $GITHUB_STEP_SUMMARY
+          echo "- **Упавших с ошибкой**: $FAILED_RUNS" >> $GITHUB_STEP_SUMMARY
+          echo "- **Отмененных/Пропущенных**: $OTHER_RUNS" >> $GITHUB_STEP_SUMMARY
+          echo "- **Доля успешных запусков (Stability)**: **${SUCCESS_RATE}%**" >> $GITHUB_STEP_SUMMARY
+
+          # Сохраняем данные в файл-артефакт
+          echo "metric_name=ci_stability_rate" > ci-metrics.txt
+          echo "workflow=ci.yml" >> ci-metrics.txt
+          echo "success_rate_percent=${SUCCESS_RATE}" >> ci-metrics.txt
+          echo "total_runs=${TOTAL_RUNS}" >> ci-metrics.txt
+          echo "success_runs=${SUCCESS_RUNS}" >> ci-metrics.txt
+          echo "failed_runs=${FAILED_RUNS}" >> ci-metrics.txt
+          echo "other_runs=${OTHER_RUNS}" >> ci-metrics.txt
+
+      - name: Upload CI Metrics Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-stability-metrics-report
+          path: ci-metrics.txt
