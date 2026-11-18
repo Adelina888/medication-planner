@@ -1,0 +1,22 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# VS Code
+.vscode/
+
+# Node.js / React
+node_modules/
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
