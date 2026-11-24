@@ -1,6 +1,6 @@
 package com.example.backend.entity;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -11,7 +11,8 @@ public class Medicine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -20,8 +21,6 @@ public class Medicine {
     private String name;
 
     private String description;
-
     private String form;
-
-    private String unit; 
+    private String unit;
 }
