@@ -1,14 +1,17 @@
 package com.example.backend.entity;
 
-
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Data
 @Table(name = "intake_status_history")
+@Getter
+@Setter
 public class IntakeStatusHistory {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,12 +20,14 @@ public class IntakeStatusHistory {
     @JoinColumn(name = "intake_id", nullable = false)
     private Intake intake;
 
-    @Column(name = "old_status")
-    private String oldStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "old_status", nullable = false)
+    private IntakeStatus oldStatus;
 
-    @Column(name = "new_status")
-    private String newStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "new_status", nullable = false)
+    private IntakeStatus newStatus;
 
-    @Column(name = "changed_at")
+    @Column(name = "changed_at", nullable = false)
     private LocalDateTime changedAt;
 }
