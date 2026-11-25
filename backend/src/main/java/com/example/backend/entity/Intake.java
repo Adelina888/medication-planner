@@ -1,8 +1,10 @@
 package com.example.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -19,5 +21,11 @@ public class Intake {
     @Column(name = "planned_datetime")
     private LocalDateTime plannedDatetime;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private IntakeStatus status;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "intake", cascade = CascadeType.ALL)
+    private List<IntakeStatusHistory> history;
 }
