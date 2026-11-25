@@ -203,13 +203,8 @@ export default function Schedules() {
           />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-          <label style={{ fontSize: '14px', fontWeight: 'bold', color: '#475569' }}>Время приема</label>
-          <input 
-            type="time" 
-            value={filterTime} 
-            onChange={handleFilterChange(setFilterTime)} 
-            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
-          />
+          <label htmlFor="filter-time" style={{ fontSize: '14px', fontWeight: 'bold', color: '#475569' }}>Время приема</label>
+          <input id="filter-time" type="time" value={filterTime} onChange={handleFilterChange(setFilterTime)} style={{ padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
         </div>
         
         {isFiltered && (
