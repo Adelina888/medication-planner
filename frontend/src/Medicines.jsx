@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import API from './api';
+import { Pencil, Trash2 } from 'lucide-react';
 
 export default function Medicines() {
   const [medicines, setMedicines] = useState([]);
@@ -98,8 +99,8 @@ export default function Medicines() {
                 <td>{med.unit}</td>
                 <td>{med.description}</td>
                 <td>
-                  <button className="icon-btn" onClick={() => openEditModal(med)} title="Редактировать">✏️</button>
-                  <button className="icon-btn text-danger" onClick={() => handleDelete(med.id)} title="Удалить">🗑️</button>
+                  <button className="icon-btn" onClick={() => openEditModal(med)} title="Редактировать"><Pencil size={18} color="#2563eb" /></button>
+                  <button className="icon-btn" onClick={() => handleDelete(med.id)} title="Удалить"><Trash2 size={18} color="#ef4444" /></button>
                 </td>
               </tr>
             ))

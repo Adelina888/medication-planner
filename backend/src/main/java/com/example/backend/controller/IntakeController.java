@@ -7,6 +7,8 @@ import com.example.backend.service.IntakeService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,13 +29,23 @@ public class IntakeController {
     }
 
     @PatchMapping("/{id}/status")
-    public Intake updateStatus(@PathVariable Long id, @RequestParam IntakeStatus status) {
-        return service.changeStatus(id, status);
+    public Intake updateStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest request) {
+        return service.changeStatus(id, request.getStatus());
     }
 
     @GetMapping("/{id}/history")
     public List<IntakeStatusHistory> getHistory(@PathVariable Long id) {
         return service.getHistory(id);
+    }
+
+    @PostMapping("/generate")
+    public void generate(Principal principal) {
+        service.generateForToday(principal.getName());
+    }
+
+    @GetMapping
+    public List<Intake> getAll(Principal principal) {
+        return service.getAllByUser(principal.getName());
     }
 }
 
@@ -43,7 +55,8 @@ class IntakeRequest {
     private LocalDateTime plannedDatetime;
 }
 
+
 @Data
-class StatusRequest {
-    private String status;
+class StatusUpdateRequest {
+    private IntakeStatus status;
 }

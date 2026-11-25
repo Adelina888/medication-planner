@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface IntakeRepository extends JpaRepository<Intake, Long> {
     List<Intake> findBySchedule(Schedule schedule);
+    List<Intake> findByScheduleOrderByPlannedDatetimeAsc(Schedule schedule);
 }

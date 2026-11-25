@@ -7,14 +7,19 @@ export default function Auth({ onLogin }) {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const endpoint = isLogin ? '/auth/login' : '/auth/register';
       const payload = isLogin ? { email, password } : { name, email, password };
       
       const { data } = await API.post(endpoint, payload);
-      localStorage.setItem('token', data); 
+      
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userEmail', data.email);
+      localStorage.setItem('userName', data.name);
+      
       onLogin(); 
     } catch (error) {
       alert(error.response?.data || 'Ошибка авторизации');
