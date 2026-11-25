@@ -4,9 +4,11 @@ import com.example.backend.entity.*;
 import com.example.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.util.List;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,19 +18,35 @@ public class IntakeService {
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
 
-
     public Intake createIntake(Long scheduleId, LocalDateTime plannedTime) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow();
         Intake intake = new Intake();
         intake.setSchedule(schedule);
         intake.setPlannedDatetime(plannedTime);
         intake.setStatus(IntakeStatus.PLANNED);
-        return intakeRepository.save(intake);
+
+        Intake saved = intakeRepository.save(intake);
+        saveHistory(saved, null);
+        return saved;
+    }
+
+    public List<Intake> getAllByUser(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        List<Schedule> schedules = scheduleRepository.findByUser(user);
+        List<Intake> allIntakes = new ArrayList<>();
+
+        for (Schedule schedule : schedules) {
+            allIntakes.addAll(intakeRepository.findBySchedule(schedule));
+        }
+
+        allIntakes.sort(Comparator.comparing(Intake::getPlannedDatetime));
+
+        return allIntakes;
     }
 
     public List<Intake> getAllBySchedule(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow();
-        return intakeRepository.findBySchedule(schedule);
+        return intakeRepository.findBySchedule(schedule); // Можно тоже отсортировать, если нужно
     }
 
     public Intake changeStatus(Long intakeId, IntakeStatus newStatus) {
@@ -38,14 +56,7 @@ public class IntakeService {
         intake.setStatus(newStatus);
         intakeRepository.save(intake);
 
-
-        IntakeStatusHistory history = new IntakeStatusHistory();
-        history.setIntake(intake);
-        history.setOldStatus(oldStatus);
-        history.setNewStatus(newStatus);
-        history.setChangedAt(LocalDateTime.now());
-        historyRepository.save(history);
-
+        saveHistory(intake, oldStatus);
         return intake;
     }
 
@@ -53,16 +64,23 @@ public class IntakeService {
         return historyRepository.findByIntakeIdOrderByChangedAtDesc(intakeId);
     }
 
+    private void saveHistory(Intake intake, IntakeStatus oldStatus) {
+        IntakeStatusHistory history = new IntakeStatusHistory();
+        history.setIntake(intake);
+        history.setOldStatus(oldStatus);
+        history.setNewStatus(intake.getStatus());
+        history.setChangedAt(LocalDateTime.now());
+        historyRepository.save(history);
+    }
 
     public List<Intake> generateForToday(String email) {
         User user = userRepository.findByEmail(email).orElseThrow();
         List<Schedule> schedules = scheduleRepository.findByUser(user);
-        List<Intake> created = new java.util.ArrayList<>();
+        List<Intake> created = new ArrayList<>();
 
         for (Schedule schedule : schedules) {
-            if (schedule.getStatus().equals("ACTIVE") && schedule.getIntakeTime() != null) {
+            if ("ACTIVE".equals(schedule.getStatus()) && schedule.getIntakeTime() != null) {
                 LocalDateTime todayTime = LocalDateTime.now().with(schedule.getIntakeTime());
-
 
                 boolean exists = intakeRepository.findBySchedule(schedule).stream()
                         .anyMatch(i -> i.getPlannedDatetime().toLocalDate().equals(todayTime.toLocalDate()));
@@ -72,7 +90,11 @@ public class IntakeService {
                     intake.setSchedule(schedule);
                     intake.setPlannedDatetime(todayTime);
                     intake.setStatus(IntakeStatus.PLANNED);
-                    created.add(intakeRepository.save(intake));
+
+                    Intake savedIntake = intakeRepository.save(intake);
+
+                    saveHistory(savedIntake, null);
+                    created.add(savedIntake);
                 }
             }
         }

@@ -21,7 +21,7 @@ public class IntakeStatusHistory {
     private Intake intake;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "old_status", nullable = false)
+    @Column(name = "old_status", nullable = true)
     private IntakeStatus oldStatus;
 
     @Enumerated(EnumType.STRING)

@@ -5,20 +5,24 @@ import Home from './Home';
 import Medicines from './Medicines';
 import Schedules from './Schedules';
 import Intakes from './Intakes';
+import Profile from './Profile';
 import './App.css';
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(!!localStorage.getItem('token'));
-  const [currentTab, setCurrentTab] = useState('home'); // По умолчанию Главная
-  const [userEmail, setUserEmail] = useState('');
+  const [currentTab, setCurrentTab] = useState('home');
+  
+  const [userEmail, setUserEmail] = useState(localStorage.getItem('userEmail') || '');
+  const [userName, setUserName] = useState(localStorage.getItem('userName') || 'Пользователь');
 
-  const handleLogin = (email) => {
-    setUserEmail(email);
+  const handleLogin = () => {
+    setUserEmail(localStorage.getItem('userEmail') || '');
+    setUserName(localStorage.getItem('userName') || 'Пользователь');
     setIsAuth(true);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.clear();
     setIsAuth(false);
   };
 
@@ -30,11 +34,11 @@ export default function App() {
     <div>
       <Header currentTab={currentTab} setCurrentTab={setCurrentTab} onLogout={handleLogout} />
       <div className="container">
-        {currentTab === 'home' && <Home userName={userEmail.split('@')[0]} />}
+        {currentTab === 'home' && <Home userName={userName} />}
         {currentTab === 'medicines' && <Medicines />}
         {currentTab === 'schedules' && <Schedules />}
         {currentTab === 'intakes' && <Intakes />}
-        
+        {currentTab === 'profile' && <Profile userEmail={userEmail} userName={userName} />}
       </div>
     </div>
   );

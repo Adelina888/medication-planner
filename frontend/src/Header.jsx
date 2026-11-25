@@ -1,5 +1,5 @@
 import { Pill, Calendar, ClipboardList, User, LogOut } from 'lucide-react';
-
+import NotificationBell from './NotificationBell';
 
 export default function Header({ currentTab, setCurrentTab, onLogout }) {
   return (
@@ -7,6 +7,7 @@ export default function Header({ currentTab, setCurrentTab, onLogout }) {
       <header style={{ backgroundColor: '#1e3a8a', color: 'white', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ margin: 0, color: 'white' }}>Medication Planner</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <NotificationBell />
           <button onClick={onLogout} style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
             <LogOut size={20} /> Выйти
           </button>

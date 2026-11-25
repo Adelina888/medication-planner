@@ -14,17 +14,18 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public String register(String email, String password) {
+    public String register(String name, String email, String password) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("Пользователь уже существует");
         }
         User user = new User();
+        user.setName(name);
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(password));
         userRepository.save(user);
         return jwtService.generateToken(email);
     }
-
+    public String getUserNameByEmail(String email) { return userRepository.findByEmail(email).map(User::getName).orElse("Пользователь"); }
     public String login(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));

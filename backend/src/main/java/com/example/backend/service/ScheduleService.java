@@ -19,7 +19,7 @@ public class ScheduleService {
 
     public List<Schedule> getAllByUser(String email) {
         User user = userRepository.findByEmail(email).orElseThrow();
-        return scheduleRepository.findByUser(user);
+        return scheduleRepository.findByUserOrderByStartDateAsc(user);
     }
 
     public Schedule create(String email, Schedule schedule, Long medicineId) {
