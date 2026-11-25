@@ -29,7 +29,7 @@ public class IntakeScheduler {
         List<Intake> allIntakes = intakeRepository.findAll();
 
         for (Intake intake : allIntakes) {
-            if (intake.getStatus() != IntakeStatus.PLANNED) continue;
+            if (intake.getStatus() != IntakeStatus.PLANNED) {continue;}
 
             if (intake.getPlannedDatetime().isBefore(fiveMinutesAgo)) {
                 intake.setStatus(IntakeStatus.SKIPPED);
