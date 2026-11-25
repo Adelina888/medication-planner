@@ -9,7 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
 import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -43,5 +46,21 @@ class MedicineServiceTest {
 
         Medicine result = medicineService.update(1L, updated);
         assertEquals("Новое", result.getName());
+    }
+
+    @Test
+    void shouldGetAllByUser() {
+        User user = new User(); user.setEmail("test@test.com");
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(user));
+        when(medicineRepository.findByUser(user)).thenReturn(List.of(new Medicine()));
+
+        List<Medicine> result = medicineService.getAllByUser("test@test.com");
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void shouldDeleteMedicine() {
+        medicineService.delete(1L);
+        verify(medicineRepository).deleteById(1L);
     }
 }

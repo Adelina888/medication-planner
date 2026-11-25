@@ -294,12 +294,24 @@ export default function Schedules() {
               <label style={{ display: 'block', marginBottom: '5px' }}>Время приема:</label>
               <input type="time" value={formData.intakeTime} onChange={e => setFormData({...formData, intakeTime: e.target.value})} required style={{ width: '100%', marginBottom: '10px', padding: '8px' }} />
               
-              <label style={{ display: 'block', marginBottom: '5px' }}>Дата начала:</label>
-              <input type="datetime-local" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} required style={{ width: '100%', marginBottom: '10px', padding: '8px' }} />
+              <label htmlFor="start-date" style={{ display: 'block', marginBottom: '5px' }}>Дата начала:</label>
+              <input 
+                id="start-date"
+                type="datetime-local" 
+                value={formData.startDate} 
+                onChange={e => setFormData({...formData, startDate: e.target.value})} 
+                required 
+                style={{ width: '100%', marginBottom: '10px', padding: '8px' }} 
+              />
               
-              <label style={{ display: 'block', marginBottom: '5px' }}>Дата окончания:</label>
-              <input type="datetime-local" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} style={{ width: '100%', marginBottom: '10px', padding: '8px' }} />
-              
+              <label htmlFor="end-date" style={{ display: 'block', marginBottom: '5px' }}>Дата окончания:</label>
+              <input 
+                id="end-date"
+                type="datetime-local" 
+                value={formData.endDate} 
+                onChange={e => setFormData({...formData, endDate: e.target.value})} 
+                style={{ width: '100%', marginBottom: '10px', padding: '8px' }} 
+              />
               <input placeholder="Комментарий" value={formData.comment} onChange={e => setFormData({...formData, comment: e.target.value})} style={{ width: '100%', marginBottom: '10px', padding: '8px' }} />
               
               <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
