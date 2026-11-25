@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Auth from './Auth';
 import Header from './Header';
 import Medicines from './Medicines';
+import Schedules from './Schedules';
 import './App.css';
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
       <Header currentTab={currentTab} setCurrentTab={setCurrentTab} onLogout={handleLogout} />
       <div className="container">
         {currentTab === 'medicines' && <Medicines />}
+        {currentTab === 'schedules' && <Schedules />}
         {currentTab === 'intakes' && <div><h2>Модуль в разработке</h2></div>}
         {currentTab === 'profile' && <div><h2>Профиль пользователя</h2></div>}
       </div>

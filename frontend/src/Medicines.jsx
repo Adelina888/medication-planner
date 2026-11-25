@@ -5,6 +5,9 @@ export default function Medicines() {
   const [medicines, setMedicines] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null); // Если null - создаем, иначе - редактируем
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
   
   const [formData, setFormData] = useState({ name: '', description: '', form: '', unit: '' });
 
@@ -37,7 +40,7 @@ export default function Medicines() {
         await API.post('/medicines', formData);
       }
       closeModal();
-      fetchMedicines(); // Остаемся на этой же странице, просто обновляем список
+      fetchMedicines(); 
     // eslint-disable-next-line no-unused-vars
     } catch (error) {
       alert("Ошибка сохранения");
@@ -62,7 +65,10 @@ export default function Medicines() {
     setEditingId(null);
     setFormData({ name: '', description: '', form: '', unit: '' });
   };
-
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentMedicines = medicines.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(medicines.length / itemsPerPage);
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -82,10 +88,10 @@ export default function Medicines() {
           </tr>
         </thead>
         <tbody>
-          {medicines.length === 0 ? (
+          {currentMedicines.length === 0 ? (
             <tr><td colSpan="5" style={{ textAlign: 'center' }}>Нет добавленных лекарств</td></tr>
           ) : (
-            medicines.map(med => (
+            currentMedicines.map(med => (
               <tr key={med.id}>
                 <td>{med.name}</td>
                 <td>{med.form}</td>
@@ -100,6 +106,14 @@ export default function Medicines() {
           )}
         </tbody>
       </table>
+      {/* Пагинация */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '15px', gap: '10px' }}>
+          <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>Назад</button>
+          <span style={{ padding: '10px' }}>Страница {currentPage} из {totalPages}</span>
+          <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>Вперед</button>
+        </div>
+      )}
 
       {/* МОДАЛЬНОЕ ОКНО ДЛЯ СОЗДАНИЯ/РЕДАКТИРОВАНИЯ */}
       {isModalOpen && (
