@@ -1,11 +1,15 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Medicines from './Medicines';
 import API from './api';
 
 vi.mock('./api');
 
 describe('Medicines', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('отображает список лекарств', async () => {
     API.get.mockResolvedValue({ data: [{ id: 1, name: 'Аспирин', form: 'tab', unit: 'mg' }] });
     render(<Medicines />);
@@ -23,6 +27,23 @@ describe('Medicines', () => {
 
     await waitFor(() => {
       expect(API.post).toHaveBeenCalledWith('/medicines', expect.objectContaining({ name: 'Nurofen' }));
+    });
+  });
+
+  it('редактирует лекарство', async () => {
+    API.get.mockResolvedValue({ data: [{ id: 1, name: 'Старое', form: 'tab', unit: 'mg' }] });
+    API.put.mockResolvedValue({});
+    render(<Medicines />);
+
+    await waitFor(() => expect(screen.getByText('Старое')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByTitle(/Редактировать/i));
+
+    fireEvent.change(screen.getByPlaceholderText(/Название/i), { target: { value: 'Новое' } });
+    fireEvent.click(screen.getByRole('button', { name: /Сохранить/i }));
+
+    await waitFor(() => {
+      expect(API.put).toHaveBeenCalledWith('/medicines/1', expect.objectContaining({ name: 'Новое' }));
     });
   });
 
